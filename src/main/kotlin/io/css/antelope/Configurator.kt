@@ -34,6 +34,7 @@ class Configurator {
                 }
             } catch (e: JsonSyntaxException) {
                 println("Failed parsing config, using fallback")
+                e.printStackTrace()
             }
             // default config
             return Config(setOf(Size.SMALL, Size.MEDIUM))

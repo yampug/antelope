@@ -1,43 +1,31 @@
 package io.css.antelope
 
+import com.yahoo.platform.yui.compressor.CssCompressor
 import org.apache.commons.io.FileUtils
 import java.io.File
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
-import java.net.HttpURLConnection
-import java.net.URL
-import java.net.URLEncoder
 
 class Minifier {
 
-    fun minify(input: String) {
-        val content = StringBuilder().apply {
-            append(URLEncoder.encode("input", "UTF-8"))
-            append("=")
-            append(URLEncoder.encode(input, "UTF-8"))
-        }.toString()
+    fun minify() {
+        val compressor = CssCompressor(FileUtils.readFileToString(File("build/antelope.css"), Charsets.UTF_8))
+        val minFileContent = compressor.compress()
+        val minFile = "build/antelope.min.css"
+        FileUtils.writeStringToFile(File(minFile), minFileContent, Charsets.UTF_8)
+        println("Minified of len ${minFileContent.length} chars")
+    }
 
-        println("Requesting minification...")
-        val request = (URL("https://cssminifier.com/raw").openConnection() as HttpURLConnection).apply {
-            requestMethod = "POST"
-            doOutput = true
-            setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
-            setRequestProperty("charset", "utf-8")
-            setRequestProperty("Content-Length", content.length.toString())
-            OutputStreamWriter(outputStream).apply {
-                write(content)
-                flush()
-            }
+    private fun minifyWithGlobalUglify(minFile: String): String {
+        // keep around in case we get rid of YUI compressor
+        try {
+            val rt = Runtime.getRuntime()
+            val proc = rt.exec(arrayOf("/bin/sh", "-c", "uglifycss build/antelope.css > $minFile"))
+
+            proc.waitFor()
+            return FileUtils.readFileToString(File(minFile), Charsets.UTF_8)
+        } catch (e: Exception) {
+            println("Couldnt minify css: ${e.message}");
+            e.printStackTrace()
         }
-
-        // Parse Response
-        if(request.responseCode == 200) {
-            val minifiedCss = InputStreamReader(request.inputStream).readText()
-            println("Minified of len ${minifiedCss.length} characters")
-            FileUtils.writeStringToFile(File("./build/antelope.css"), minifiedCss, Charsets.UTF_8)
-        }
-
-        // Handle Error
-        else println("Error: ${request.responseCode} ${request.responseMessage}")
+        return ""
     }
 }
