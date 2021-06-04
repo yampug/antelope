@@ -1,4 +1,4 @@
-package io.css.antelope
+package io.css.antelope.core
 
 data class Rule(
     val name: String,

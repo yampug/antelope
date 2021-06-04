@@ -1,4 +1,4 @@
-package io.css.antelope
+package io.css.antelope.core
 
 class Constants {
 

@@ -1,8 +1,10 @@
-package io.css.antelope
+package io.css.antelope.core
+
+import io.css.antelope.Config
 
 class Core {
 
-    fun generate(): String {
+    fun generate(config: Config): String {
         val rules = mutableListOf<Rule>()
         rules.addAll(genHeight())
         rules.addAll(genWidth())
@@ -21,7 +23,7 @@ class Core {
         }
 
         // prefixed rules
-        for (size in Size.values()) {
+        for (size in config.sizes) {
             out.append("@media (min-width: ${size.pixel}px) {\n")
             out.append(".${size.prefix} {}\n")
             for (rule in rules) {
@@ -191,7 +193,8 @@ class Core {
     private fun genFlexDirections(): List<Rule> {
         return listOf(
             Rule("flex-dir-col", mapOf("flex-direction" to "column")),
-            Rule("flex-dir-row", mapOf("flex-direction" to "row"))
+            Rule("flex-dir-row", mapOf("flex-direction" to "row")),
+            Rule("flex-dir-col-rev", mapOf("flex-direction" to "column-reverse"))
         )
     }
 }

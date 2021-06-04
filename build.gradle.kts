@@ -15,6 +15,7 @@ repositories {
 dependencies {
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation("commons-io:commons-io:2.9.0")
+    implementation("com.google.code.gson:gson:2.8.7")
 
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
